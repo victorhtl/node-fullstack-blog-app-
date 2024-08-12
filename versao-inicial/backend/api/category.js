@@ -31,6 +31,24 @@ const withPath = categories => {
     return categoriesWithPath
 }
 
+// transforma um array em uma estrutura de árvore
+const toTree = (categories, tree) => {
+    if(!tree) tree = categories.filter(c => !c.parentId)
+    tree = tree.map(parentNode => {
+        const isChild = node => node.parentId == parentNode.id
+        parentNode.children = toTree(categories, categories.filter(isChild))
+        return parentNode
+    })
+    return tree
+}
+
+// Retorna um JSON
+router.get('/tree', (req, res)=>{
+    db('categories')
+        .then(categories => res.json(toTree(categories)))
+        .catch(err => res.status(500).send(err))
+})
+
 router.get('/:id', (req, res)=>{
     try {
         const category = db('categories')
