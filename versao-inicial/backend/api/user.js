@@ -10,8 +10,8 @@ function encryptPassoword(password){
     return bcrypt.hashSync(password, salt)
 }
 
-router.get('/:id', async (req, res)=>{
-    await db('users')
+router.get('/:id', (req, res)=>{
+    db('users')
         .select('id', 'name', 'email', 'admin')
         .where({id: req.params.id})
         .first()
@@ -25,8 +25,8 @@ router.get('/:id', async (req, res)=>{
         })
 })
 
-router.get('/', async (req, res)=>{
-    await db('users')
+router.get('/', (req, res)=>{
+    db('users')
         .select('id', 'name', 'email', 'admin')
         // ISTO AQUI TA UMA ZONA
         .then(users => {

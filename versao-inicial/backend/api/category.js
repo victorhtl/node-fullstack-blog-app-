@@ -32,11 +32,17 @@ const withPath = categories => {
 }
 
 router.get('/:id', (req, res)=>{
-    db('categories')
-        .where({id: req.params.id})
-        .first()
-        .then(category => res.json(category))
-        .catch(err => res.status(500).send(err))
+    try {
+        const category = db('categories')
+            .where({id: req.params.id})
+            .first()
+            
+        existsOrError(category, 'category do not exist')
+
+        res.json(category)
+    }catch(msg){
+        res.status(400).send('No category found')
+    }
 })
 
 router.get('/', (req, res)=>{
@@ -50,31 +56,31 @@ router.post('/', async (req, res) => {
 
     try {
         existsOrError(category.name, 'Category Name is missing')
+    
+        db('categories')
+            .insert(category)
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
     } catch(msg){
         res.status(400).send(msg)
     }
-
-    await db('categories')
-        .insert(category)
-        .then(_ => res.status(204).send())
-        .catch(err => res.status(500).send(err))
 })
 
-router.put('/', async (req, res) =>{
+router.put('/', (req, res) =>{
     const category = {...req.body}
 
     try {
         existsOrError(category.name, 'Category name is missing')
         existsOrError(category.id, 'Category id is missing')
+    
+        db('categories')
+            .update(category)
+            .where({id: category.id})
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
     } catch(msg){
         res.status(400).send(msg)
     }
-
-    await db('categories')
-        .update(category)
-        .where({id: category.id})
-        .then(_ => res.status(204).send())
-        .catch(err => res.status(500).send(err))
 })
 
 router.delete('/', async (req, res)=>{
