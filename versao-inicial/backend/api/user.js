@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt-nodejs') // encriptar senha de usuario
 const express = require('express')
-const {existsOrError, notExistsOrError, equalsOrError} = require('./validation.js')
+const {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
 
 const router = express.Router()
@@ -11,9 +11,16 @@ function encryptPassoword(password){
 }
 
 router.get('/:id', (req, res)=>{
+    const userId = req.params.id
+
+    if(isNotPositiveInteger(userId)){
+        res.status(400).send('Id must be a positive integer numeber')
+        return
+    }
+
     db('users')
         .select('id', 'name', 'email', 'admin')
-        .where({id: req.params.id})
+        .where({id: userId})
         .first()
         .then(user => {
             try {
@@ -69,6 +76,11 @@ router.put('/:id', async (req,res)=>{
     const user = {...req.body}
     user.id = req.params.id
 
+    if(isNotPositiveInteger(user.id)){
+        res.status(400).send('Id must be a positive integer numeber')
+        return
+    }
+
     try {
         existsOrError(user.name, 'Name is missing')
         existsOrError(user.email, 'Email is missing')
@@ -95,6 +107,11 @@ router.put('/:id', async (req,res)=>{
 router.delete('/:id', async(req,res)=>{
     const user = {...req.body}
     user.id = req.params.id
+
+    if(isNotPositiveInteger(user.id)){
+        res.status(400).send('Id must be a positive integer numeber')
+        return
+    }
 
     try {
         const userFromDB = await db('users').where({id: user.id}).first()

@@ -29,7 +29,7 @@ module.exports = app => {
                 notExistsOrError(userFromDB, 'Usuário já cadastrado')
             }
         } catch(msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send(msg) 
         }
 
         user.password = encryptPassword(user.password)

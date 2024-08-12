@@ -1,5 +1,5 @@
 const express = require('express')
-const {existsOrError, notExistsOrError, equalsOrError} = require('./validation.js')
+const {existsOrError, notExistsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
 
 const router = express.Router()
@@ -50,9 +50,15 @@ router.get('/tree', (req, res)=>{
 })
 
 router.get('/:id', (req, res)=>{
+    const categoryId = req.params.id
+
+    if(isNotPositiveInteger(categoryId)){
+        res.status(400).send('Id must be a positive integer numeber')
+        return
+    }
     try {
         const category = db('categories')
-            .where({id: req.params.id})
+            .where({id: categoryId})
             .first()
             
         existsOrError(category, 'category do not exist')
@@ -101,20 +107,27 @@ router.put('/', (req, res) =>{
     }
 })
 
-router.delete('/', async (req, res)=>{
+router.delete('/:id', async (req, res)=>{
+    const categoryId = req.params.id
+
+    if(isNotPositiveInteger(categoryId)){
+        res.status(400).send('Id must be a positive integer numeber')
+        return
+    }
+
     try {
-        existsOrError(req.params.id, 'Category id is missing')
+        existsOrError(categoryId, 'Category id is missing')
 
         const subcategory = await db('categories')
-            .where({parentId: req.params.id})
+            .where({parentId: categoryId})
         notExistsOrError(subcategory, 'Category has subcategories')
 
         const articles = await db('categories')
-            .where({categoryId: req.params.id})
+            .where({categoryId: categoryId})
         notExistsOrError(articles, 'Category has articles')
 
         const rowsDeleted = await db('categories')
-            .where({id: req.params.id}).del()
+            .where({id: categoryId}).del()
         existsOrError(rowsDeleted, 'Category not found')
 
         res.status(204).send()

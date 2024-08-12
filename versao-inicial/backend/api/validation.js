@@ -21,4 +21,8 @@ function equalsOrError(valueA, valueB, msg){
     if(valueA != valueB) throw msg
 }
 
-module.exports = {existsOrError, notExistsOrError, equalsOrError}
+function isNotPositiveInteger(value) {
+    return !(typeof value === 'number' && Number.isInteger(value) && value > 0);
+}
+
+module.exports = {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger}
