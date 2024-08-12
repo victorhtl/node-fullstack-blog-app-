@@ -25,18 +25,17 @@ router.get('/:id', (req, res)=>{
         })
 })
 
-router.get('/', (req, res)=>{
-    db('users')
-        .select('id', 'name', 'email', 'admin')
-        // ISTO AQUI TA UMA ZONA
-        .then(users => {
-            try{
-                existsOrError(users, 'There is no user that matches this id')
-                res.json(users)
-            } catch(msg){
-                res.status(500).send(msg)
-            }
-        })
+router.get('/', async (req, res)=>{
+    try {
+        const user = await db('users')
+            .select('id', 'name', 'email', 'admin')
+            .catch(err => res.status(500).send(err))   
+        
+        existsOrError(users, 'There is no user that matches this id')
+        res.json(users)
+    } catch(msg){
+        res.status(400).send(msg)
+    }
 })
 
 router.post('/', async (req, res)=>{
