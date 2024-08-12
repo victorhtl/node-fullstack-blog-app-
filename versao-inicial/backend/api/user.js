@@ -32,10 +32,10 @@ router.get('/', async (req, res)=>{
         .then(users => {
             try{
                 existsOrError(users, 'There is no user that matches this id')
+                res.json(users)
             } catch(msg){
                 res.status(500).send(msg)
             }
-            res.json(users)
         })
 })
 
@@ -51,17 +51,18 @@ router.post('/', async (req, res)=>{
     
         const userFromDB = await db('users').where({email: user.email}).first()
         notExistsOrError(userFromDB, 'User already exists')
+    
+        user.password = encryptPassoword(user.password)
+        user.password = encryptPassoword(user.password)
+        delete user.confirmPassword
+
+        db('users')
+            .insert(user)
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
     } catch(msg) {
         res.status(400).send(msg)
     }
-
-    user.password = encryptPassoword(user.password)
-    delete user.confirmPassword
-
-    db('users')
-        .insert(user)
-        .then(_ => res.status(204).send())
-        .catch(err => res.status(500).send(err))
 })
 
 // Precisa enviar com id no body da requisicao
@@ -77,16 +78,37 @@ router.put('/:id', async (req,res)=>{
         equalsOrError(user.password, user.confirmPassword, 'Passwords do not match')
     
         const userFromDB = await db('users').where({id: user.id}).first()
-        ExistsOrError(userFromDB, 'User not exists')
+        existsOrError(userFromDB, 'User do not exist')
+    
+        delete user.confirmPassword
+
+        db('users')
+            .update(user)
+            .where({id: user.id})
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
+    
     } catch(msg) {
         res.status(400).send(msg)
     }
+})
 
-    db('users')
-        .update(user)
-        .where({id: user.id})
-        .then(_ => res.status(204).send())
-        .catch(err => res.status(500).send(err))
+router.delete('/:id', async(req,res)=>{
+    const user = {...req.body}
+    user.id = req.params.id
+
+    try {
+        const userFromDB = await db('users').where({id: user.id}).first()
+        existsOrError(userFromDB, 'User do not exist')
+    
+        db('users')
+            .delete()
+            .where({id: user.id})
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
+    } catch(msg){
+        res.status(400).send(msg)
+    }
 })
 
 module.exports = router

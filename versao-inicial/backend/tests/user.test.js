@@ -39,7 +39,9 @@ describe('EndPoint /users', ()=> {
         it.todo('errors')
     })
     describe('DELETE', ()=>{
-        it.todo('return status')
+        it.todo('must return 204 when deleting', ()=>{
+            
+        })
         it.todo('errors')
     })
 })

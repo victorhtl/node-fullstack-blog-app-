@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon",
+    "debug": "DEBUG=express:* node index.js",
     "test": "jest",
     "production": "pm2 start index.js --name knowledge-backend"
   },
