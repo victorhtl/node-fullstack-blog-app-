@@ -1,10 +1,8 @@
-const {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger} = require('./validation.js')
+const {existsOrError, isNotPositiveInteger} = require('./validation.js')
 const express = require('express')
 const db = require('../Database/db.js')
 
 const router = express.Router()
-
-router.get('/', ()=>{})
 
 router.post('/', (req, res)=>{
     const article = {...req.body}
@@ -62,13 +60,48 @@ router.delete('/:id', async (req, res) => {
     try {
         const rowsDeleted = await db('articles')
             .where({id: articleId}).del()
-
-        notExistsOrError(rowsDeleted, 'Article not founded')
+        
+        try{
+            existsOrError(rowsDeleted, 'Article not founded')
+        } catch(msg){
+            return res.status(400).send(msg)
+        }
     
         res.status(204).send()
     } catch(msg){
         res.status(500).send(msg)
     }
+})
+
+router.get('/:id', (req, res)=>{
+    const articleId = req.params.id
+    if(isNotPositiveInteger(articleId)){
+        res.status(400).send('Id must be a positive integer numeber')
+        return
+    }
+    db('articles')
+        .where({id: articleId})
+        .first()
+        .then(article => {
+            article.content = article.content.toString()
+            return res.json(article)
+        })
+        .catch(err => res.status(500).send(err))
+})
+
+// Paginacao
+const limit = 10
+router.get('/', async (req, res)=>{
+    const page = req.query.page || 1
+
+    const result = await db('articles').count('id').first()
+    const count = parseInt(result.count)
+
+    db('articles')
+        .select('id', 'name', 'description')
+        .limit(limit).offset(page * limit - limit)
+        .then(articles => res.json({data: articles, count, limit}))
+        .catch(err => res.status(500).send(err))
 })
 
 module.exports = router
