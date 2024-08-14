@@ -1,6 +1,7 @@
 const express = require('express')
 const {existsOrError, notExistsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
+const queries = require('./queries.js')
 
 const router = express.Router()
 
@@ -41,6 +42,24 @@ const toTree = (categories, tree) => {
     })
     return tree
 }
+
+const limit = 10
+router.get('/:id/articles', async(req, res)=>{
+    const categoryId = req.params.id
+    const page = req.query.page || 1
+    const categories = await db.raw(queries.categoryWithChildren, categoryId)
+    const ids = categories.rows.map(c=>c.id)
+
+    db({a: 'articles', u:'users'})
+        .select('a.id', 'a.name', 'á.description', 'a.imageUrl', {author: 'u.name'})
+        .limit(limit).offset(page * limit - limit)
+        .whereRaw('?? == ??', ['u.id', 'a.userId'])
+        .whereIn('categoryId', ids)
+        .orderBy('a.id', 'desc')
+        .then(articles => res.json(articles))
+        .catch(err => res.status(500).send(err))
+})
+
 
 // Retorna um JSON
 router.get('/tree', (req, res)=>{
