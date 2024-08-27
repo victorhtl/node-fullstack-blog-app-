@@ -68,23 +68,22 @@ router.get('/tree', (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-router.get('/:id', (req, res)=>{
+router.get('/:id', async (req, res)=>{
     const categoryId = req.params.id
 
-    if(isNotPositiveInteger(categoryId)){
-        res.status(400).send('Id must be a positive integer numeber')
-        return
+    if(isNotPositiveInteger(parseInt(categoryId))){
+        return res.status(400).send('Id must be a positive integer numeber')
     }
     try {
-        const category = db('categories')
+        const category = await db('categories')
+            .select('id', 'name', 'parentId')
             .where({id: categoryId})
             .first()
             
         existsOrError(category, 'category do not exist')
-
-        res.json(category)
-    }catch(msg){
-        res.status(400).send('No category found')
+        res.status(200).send(category)
+    } catch(msg){
+        return res.status(400).send(msg)
     }
 })
 
@@ -94,19 +93,19 @@ router.get('/', (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
     const category = {...req.body}
 
     try {
         existsOrError(category.name, 'Category Name is missing')
-    
-        db('categories')
-            .insert(category)
-            .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(err))
     } catch(msg){
-        res.status(400).send(msg)
+        return res.status(400).send(msg)
     }
+
+    db('categories')
+        .insert(category, 'id')
+        .then(id => res.status(200).send(id))
+        .catch(err => res.status(500).send(err))
 })
 
 router.put('/', (req, res) =>{
@@ -115,23 +114,21 @@ router.put('/', (req, res) =>{
     try {
         existsOrError(category.name, 'Category name is missing')
         existsOrError(category.id, 'Category id is missing')
-    
-        db('categories')
-            .update(category)
-            .where({id: category.id})
-            .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(err))
     } catch(msg){
-        res.status(400).send(msg)
+        return res.status(400).send(msg)
     }
+    db('categories')
+        .update(category)
+        .where({id: category.id})
+        .then(_ => res.status(204).send())
+        .catch(err => res.status(500).send(err))
 })
 
 router.delete('/:id', async (req, res)=>{
     const categoryId = req.params.id
 
-    if(isNotPositiveInteger(categoryId)){
-        res.status(400).send('Id must be a positive integer numeber')
-        return
+    if(isNotPositiveInteger(parseInt(categoryId))){
+        return res.status(400).send('Id must be a positive integer number')
     }
 
     try {
@@ -141,7 +138,7 @@ router.delete('/:id', async (req, res)=>{
             .where({parentId: categoryId})
         notExistsOrError(subcategory, 'Category has subcategories')
 
-        const articles = await db('categories')
+        const articles = await db('articles')
             .where({categoryId: categoryId})
         notExistsOrError(articles, 'Category has articles')
 
@@ -149,10 +146,10 @@ router.delete('/:id', async (req, res)=>{
             .where({id: categoryId}).del()
         existsOrError(rowsDeleted, 'Category not found')
 
-        res.status(204).send()
+        res.sendStatus(200)
 
     } catch(msg){
-        res.status(400).send(msg)
+        return res.status(400).send(msg)
     }
 })
 
