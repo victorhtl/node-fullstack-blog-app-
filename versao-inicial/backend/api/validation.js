@@ -1,6 +1,7 @@
-// se é falso
-// se é um array vazio
-// se é uma string vazia
+// erro se
+// falso
+// é um array vazio
+// é uma string vazia
 function existsOrError(value, msg){
     if(!value) throw msg
     if(Array.isArray(value) && value.length == 0) throw msg
@@ -22,7 +23,7 @@ function equalsOrError(valueA, valueB, msg){
 }
 
 function isNotPositiveInteger(value) {
-    return !(typeof value === 'number' && Number.isInteger(value) && value > 0);
+    return !(typeof value === 'number' && value > 0);
 }
 
 module.exports = {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger}
