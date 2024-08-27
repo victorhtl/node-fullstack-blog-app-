@@ -4,6 +4,9 @@ const db = require('../Database/db.js')
 
 const router = express.Router()
 
+// Paginacao dos articles
+const limit = 10
+
 router.post('/', (req, res)=>{
     const article = {...req.body}
 
@@ -13,23 +16,20 @@ router.post('/', (req, res)=>{
         existsOrError(article.categoryId, 'Category is missing')
         existsOrError(article.userId, 'Author is missing')
         existsOrError(article.content, 'Content is missing')
-    
-        db('articles')
-            .insert(article)
-            .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(msg))
     } catch(msg) {
-        res.status(400).send(msg)
+        return res.status(400).send(msg)
     }
+    db('articles')
+        .insert(article, 'id')
+        .then(id => res.status(200).send(id))
+        .catch(err => res.status(500).send(err))
 })
 
-router.put('/:id', (req, res)=>{
+router.put('/', (req, res)=>{
     const article = {...req.body}
-    const articleId = req.params.id
 
-    if(isNotPositiveInteger(articleId)){
-        res.status(400).send('Id must be a positive integer numeber')
-        return
+    if(isNotPositiveInteger(article.id)){
+        return res.status(400).send('Id must be a positive integer number')
     }
 
     try {
@@ -38,15 +38,14 @@ router.put('/:id', (req, res)=>{
         existsOrError(article.categoryId, 'Category is missing')
         existsOrError(article.userId, 'Author is missing')
         existsOrError(article.content, 'Content is missing')
-    
-        db('articles')
-            .update(article)
-            .where({id})
-            .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(msg))
     } catch(msg) {
-        res.status(400).send(msg)
+        return res.status(400).send(msg)
     }
+    db('articles')
+        .update(article)
+        .where({id: article.id})
+        .then(_ => res.sendStatus(204))
+        .catch(err => res.status(500).send(err))
 })
 
 router.delete('/:id', async (req, res) => {
@@ -60,25 +59,22 @@ router.delete('/:id', async (req, res) => {
     try {
         const rowsDeleted = await db('articles')
             .where({id: articleId}).del()
-        
-        try{
-            existsOrError(rowsDeleted, 'Article not founded')
-        } catch(msg){
-            return res.status(400).send(msg)
-        }
     
-        res.status(204).send()
+        existsOrError(rowsDeleted, 'Article not founded')
+    
+        res.sendStatus(204)
     } catch(msg){
-        res.status(500).send(msg)
+        return res.status(400).send(msg)
     }
 })
 
 router.get('/:id', (req, res)=>{
     const articleId = req.params.id
-    if(isNotPositiveInteger(articleId)){
-        res.status(400).send('Id must be a positive integer numeber')
-        return
+
+    if(isNotPositiveInteger(parseInt(articleId))){
+        return res.status(400).send('Id must be a positive integer number')
     }
+
     db('articles')
         .where({id: articleId})
         .first()
@@ -89,8 +85,6 @@ router.get('/:id', (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-// Paginacao
-const limit = 10
 router.get('/', async (req, res)=>{
     const page = req.query.page || 1
 

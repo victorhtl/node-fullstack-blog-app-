@@ -5,6 +5,9 @@ const queries = require('./queries.js')
 
 const router = express.Router()
 
+// Pagincaçao
+const limit = 10
+
 const withPath = categories => {
     const getParent = (categories, parentId) => {
         const parent = categories.filter(parent => parent.id === parentId)
@@ -43,13 +46,15 @@ const toTree = (categories, tree) => {
     return tree
 }
 
-const limit = 10
 router.get('/:id/articles', async(req, res)=>{
     const categoryId = req.params.id
     const page = req.query.page || 1
+    // A query abaixo seleciona todos os IDs baseados nos ids pai
     const categories = await db.raw(queries.categoryWithChildren, categoryId)
     const ids = categories.rows.map(c => c.id)
 
+    // Consulta que interage com 2 tabelas, articles e users
+    // para recuperar o nome do usuário para aquele artigo
     db({a: 'articles', u: 'users'})
         .select('a.id', 'a.name', 'a.description', 'a.imageUrl', { author: 'u.name' })
         .limit(limit).offset(page * limit - limit)
