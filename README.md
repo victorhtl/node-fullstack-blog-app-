@@ -14,3 +14,4 @@ e criar uma espécie de "backup" em exports.down. Para cada nova versão do up, 
 Foi utilizado o consign para fazer a organização dos endpoints da API. Tente fazer sem o consign depois
 
 ## TODO
+FIX get articles by category id 
