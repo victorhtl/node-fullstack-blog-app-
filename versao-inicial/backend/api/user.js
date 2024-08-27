@@ -73,6 +73,7 @@ router.put('/', async (req,res)=>{
     }
 
     try {
+        existsOrError(user.id, "Id is missing")
         existsOrError(user.name, 'Name is missing')
         existsOrError(user.email, 'Email is missing')
         existsOrError(user.password, 'Password is missing')
