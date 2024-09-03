@@ -1,17 +1,39 @@
 # knowledge
 
-## Migrations do Knex
-As migrations funcionam como um histórico automatizado. Você pode ir criando novas versões do banco em exports.up
-e criar uma espécie de "backup" em exports.down. Para cada nova versão do up, desfaça ela no down
+## Run backend
+- cd backend
+- npm i
+- npm start
 
-## Run versao-final
-- Execute o npm i tanto no diretório frontend quanto no backend
-- Execute o mongod localmente na máquina com o comando sudo systemctl start mongod
-- No diretorio backend, rode npm start
-- No diretório frontend, rode npm run serve -- --port 8081
 
-## Observacoes
-Foi utilizado o consign para fazer a organização dos endpoints da API. Tente fazer sem o consign depois
+## Tentativa de utilizar o jwt
 
-## TODO
-FIX get articles by category id 
+const { authSecret } = require('../.env')
+const passport = require('passport')
+const passportJwt = require('passport-jwt')
+const { Strategy, ExtractJwt } = passportJwt
+const db = require('../Database/db.js')
+
+// estrategia
+module.exports = (req, res, next) => {
+    // o passport-jwt vai pegar o cabeçalho "authorization" da requisição e ler o token que veio com ele
+    const params = {
+        secretOrKey: authSecret,
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken() // o token vai vir com "bearer" antes no token em si
+    }
+
+    // o payload é o mesmo gerado em auth.js com as informações de usuário
+    const strategy = new Strategy(params, (payload, done)=>{
+        db('users')
+            .where({id: payload.id})
+            .first()
+            .then(user => done(null, user ? {...payload} : false))
+            .catch(err => done(err, false))
+    })
+
+    passport.use(strategy)
+
+    passport.authenticate('jwt', {session:false})
+
+    next()
+}
