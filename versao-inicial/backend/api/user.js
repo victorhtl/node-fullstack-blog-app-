@@ -1,14 +1,46 @@
-const bcrypt = require('bcrypt-nodejs') // encriptar senha de usuario
+const bcrypt = require('bcrypt')
 const express = require('express')
 const {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
 
 const router = express.Router()
 
-function encryptPassoword(password){
-    const salt = bcrypt.genSaltSync(10)
-    return bcrypt.hashSync(password, salt)
+function encryptPassword(password) {
+    const saltRounds = 10; // between 10-12 is recommended
+    return bcrypt.genSalt(saltRounds)
+        .then(salt => bcrypt.hash(password, salt))
+        .then(hash => {
+            return hash;
+        })
+        .catch(err => {
+            throw err;
+        });
 }
+
+router.post('/', async (req, res)=>{
+    const user = {...req.body}
+    
+    try {
+        existsOrError(user.name, 'Name is missing')
+        existsOrError(user.email, 'Email is missing')
+        existsOrError(user.password, 'Password is missing')
+        existsOrError(user.confirmPassword, 'Confirm Password is missing')
+        equalsOrError(user.password, user.confirmPassword, 'Passwords do not match')
+        delete user.confirmPassword
+        const userFromDB = await db('users').where({email: user.email}).first()
+        notExistsOrError(userFromDB, 'User already exists')
+
+    } catch(msg) {
+        return res.status(400).send(msg)
+    }
+
+    user.password = await encryptPassword(user.password)
+    
+    db('users')
+            .insert(user, 'id')
+            .then(id => res.status(200).send(id))
+            .catch(err => res.status(500).send(err))
+})
 
 router.get('/:id', async (req, res)=>{
     const userId = parseInt(req.params.id)
@@ -36,32 +68,6 @@ router.get('/', (req, res)=>{
         .select('id', 'name', 'email', 'admin')
         .then(resp => res.status(200).json(resp))
         .catch(err => res.status(500).send(err))   
-})
-
-router.post('/', async (req, res)=>{
-    const user = {...req.body}
-    
-    try {
-        existsOrError(user.name, 'Name is missing')
-        existsOrError(user.email, 'Email is missing')
-        existsOrError(user.password, 'Password is missing')
-        existsOrError(user.confirmPassword, 'Confirm Password is missing')
-        equalsOrError(user.password, user.confirmPassword, 'Passwords do not match')
-    
-        const userFromDB = await db('users').where({email: user.email}).first()
-        notExistsOrError(userFromDB, 'User already exists')
-
-    } catch(msg) {
-        return res.status(400).send(msg)
-    }
-
-    user.password = encryptPassoword(user.password)
-    user.password = encryptPassoword(user.password)
-    delete user.confirmPassword
-    db('users')
-            .insert(user, 'id')
-            .then(id => res.status(200).send(id))
-            .catch(err => res.status(500).send(err))
 })
 
 router.put('/', async (req,res)=>{
