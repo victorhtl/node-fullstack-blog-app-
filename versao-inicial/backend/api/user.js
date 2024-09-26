@@ -18,6 +18,27 @@ function encryptPassword(password) {
         });
 }
 
+router.get('/:id', async (req, res)=>{
+    const userId = parseInt(req.params.id)
+
+    if(isNotPositiveInteger(userId)){
+        return res.status(400).send('Id must be a positive number')
+    }
+
+    try {
+        const user = await db('users')
+            .select('id', 'name', 'email', 'admin')
+            .where({id: userId})
+            .first()
+            .catch(err => res.sendStatus(500))
+        
+        existsOrError(user, 'User not exists')
+        res.status(200).send(user)
+    } catch(msg) {
+        return res.status(400).send(msg)
+    }
+})
+
 router.post('/', async (req, res)=>{
     const user = {...req.body}
     
@@ -38,30 +59,9 @@ router.post('/', async (req, res)=>{
     user.password = await encryptPassword(user.password)
     
     db('users')
-            .insert(user, 'id')
-            .then(id => res.status(200).send(id))
-            .catch(err => res.status(500).send(err))
-})
-
-router.get('/:id', async (req, res)=>{
-    const userId = parseInt(req.params.id)
-
-    if(isNotPositiveInteger(userId)){
-        return res.status(400).send('Id must be a positive number')
-    }
-
-    try {
-        const user = await db('users')
-            .select('id', 'name', 'email', 'admin')
-            .where({id: userId})
-            .first()
-            .catch(err => res.sendStatus(500))
-        
-        existsOrError(user, 'User not exists')
-        res.status(200).send(user)
-    } catch(msg) {
-        return res.status(400).send(msg)
-    }
+        .insert(user, 'id')
+        .then(id => res.status(200).send(id))
+        .catch(err => res.status(500).send(err))
 })
 
 router.get('/', (req, res)=>{

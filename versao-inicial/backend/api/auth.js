@@ -6,8 +6,7 @@ const db = require('../Database/db.js')
 
 const router = express.Router()
 
-// valida o login e gera o token
-// password deve ser uma string
+// validate the user and generate JWT
 router.post('/', async (req, res)=>{
     // valida o usuario
     if(!req.body.email || !req.body.password){
@@ -29,7 +28,6 @@ router.post('/', async (req, res)=>{
     const isMatch = await bcrypt.compare(req.body.password, user.password)
     if(!isMatch) return res.status(401).send('Email/Password wrong')
 
-    // utiliza o Date.now() para definir o periodo de expiracao do token
     const now = Math.floor(Date.now() / 1000) // segundos
     
     // para criar o token
@@ -38,35 +36,14 @@ router.post('/', async (req, res)=>{
         name: user.name,
         email: user.email,
         admin: user.admin,
-        iat: now, // emido em
-        exp: now + (60*60*24*3) // expira em 3 dias
+        iat: now, // issued at
+        exp: now + (60*60*24*3) // expires in 3d
     }
 
     res.json({
         ...payload,
         token: jwt.encode(payload, authSecret)
     })
-})
-
-// Validate token according to date
-router.post('/validateToken', (req, res)=>{
-    const user = req.body || null
-    try {
-        if(user){
-            // decodifica o token utilizando decode e o authSecret
-            const token = jwt.decode(userData.token, authSecret)
-
-            // Verifica a idade do token
-            if(new Date(token.exp * 1000  > new Date())){
-                return res.send(true)
-            }
-        }
-    } catch(err){
-        // se o token expirou
-        // se o authSecret estive errado
-    }
-
-    res.send(false)
 })
 
 module.exports = router
