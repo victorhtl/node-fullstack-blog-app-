@@ -28,11 +28,8 @@ router.post('/', (req, res)=>{
 router.put('/', (req, res)=>{
     const article = {...req.body}
 
-    if(isNotPositiveInteger(article.id)){
-        return res.status(400).send('Id must be a positive integer number')
-    }
-
     try {
+        existsOrError(article.id, 'Id is missing')
         existsOrError(article.name, 'Name is missing')
         existsOrError(article.description, 'Description is missing')
         existsOrError(article.categoryId, 'Category is missing')
@@ -51,16 +48,15 @@ router.put('/', (req, res)=>{
 router.delete('/:id', async (req, res) => {
     const articleId = req.params.id
 
-    if(isNotPositiveInteger(articleId)){
-        res.status(400).send('Id must be a positive integer numeber')
-        return
+    if(isNotPositiveInteger(parseInt(articleId))){
+        return res.status(400).send('Id must be a positive integer number')
     }
 
     try {
         const rowsDeleted = await db('articles')
             .where({id: articleId}).del()
     
-        existsOrError(rowsDeleted, 'Article not founded')
+        existsOrError(rowsDeleted, 'Article not found')
     
         res.sendStatus(204)
     } catch(msg){
