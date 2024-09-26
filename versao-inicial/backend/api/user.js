@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt')
 const express = require('express')
 const {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
-const passport = require('passport')
+const isAdmin = require('../config/admin.js')
 
 const router = express.Router()
 
@@ -18,7 +18,7 @@ function encryptPassword(password) {
         });
 }
 
-router.get('/:id', async (req, res)=>{
+router.get('/:id', isAdmin, async (req, res)=>{
     const userId = parseInt(req.params.id)
 
     if(isNotPositiveInteger(userId)){
@@ -39,7 +39,7 @@ router.get('/:id', async (req, res)=>{
     }
 })
 
-router.post('/', async (req, res)=>{
+router.post('/', isAdmin, async (req, res)=>{
     const user = {...req.body}
     
     try {
@@ -64,14 +64,14 @@ router.post('/', async (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-router.get('/', (req, res)=>{
+router.get('/', isAdmin, (req, res)=>{
     db('users')
         .select('id', 'name', 'email', 'admin')
         .then(resp => res.status(200).json(resp))
         .catch(err => res.status(500).send(err))   
 })
 
-router.put('/', async (req,res)=>{
+router.put('/', isAdmin, async (req,res)=>{
     const user = {...req.body}
 
     if(isNotPositiveInteger(user.id)){

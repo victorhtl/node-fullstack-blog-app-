@@ -2,6 +2,7 @@ const express = require('express')
 const {existsOrError, notExistsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
 const queries = require('./queries.js')
+const isAdmin = require('../config/admin.js')
 
 const router = express.Router()
 
@@ -92,13 +93,13 @@ router.get('/:id', async (req, res)=>{
     }
 })
 
-router.get('/', (req, res)=>{
+router.get('/', isAdmin, (req, res)=>{
     db('categories')
         .then(categories => res.json(withPath(categories)))
         .catch(err => res.status(500).send(err))
 })
 
-router.post('/', (req, res) => {
+router.post('/', isAdmin, (req, res) => {
     const category = {...req.body}
 
     try {
@@ -113,7 +114,7 @@ router.post('/', (req, res) => {
         .catch(err => res.status(500).send(err))
 })
 
-router.put('/', (req, res) =>{
+router.put('/', isAdmin, (req, res) =>{
     const category = {...req.body}
 
     try {
@@ -129,7 +130,7 @@ router.put('/', (req, res) =>{
         .catch(err => res.status(500).send(err))
 })
 
-router.delete('/:id', async (req, res)=>{
+router.delete('/:id', isAdmin, async (req, res)=>{
     const categoryId = req.params.id
 
     if(isNotPositiveInteger(parseInt(categoryId))){

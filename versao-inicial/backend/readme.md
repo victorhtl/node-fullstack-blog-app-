@@ -1,5 +1,8 @@
 # Backend documentation
 All posts must be made in JSON format
+The API is protected with JWT. You need to authenticate with the following routes in order to get your token
+/signin
+/signup
 
 ## Run backend
 - cd /backend

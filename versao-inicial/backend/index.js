@@ -4,7 +4,7 @@ const passport = require('passport')
 
 const app = express()
 
-require('./passport/passport.js')(passport)
+require('./config/passport.js')(passport)
 passport.initialize()
 
 // api
@@ -23,6 +23,7 @@ app.use('/signup', register)
 
 /**
  * Passport will verify the token's exp date
+ * and create the req.user obj for every request
  */
 app.use(passport.authenticate('jwt', {session: false}))
 

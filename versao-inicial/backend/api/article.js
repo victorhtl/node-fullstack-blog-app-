@@ -1,13 +1,14 @@
 const {existsOrError, isNotPositiveInteger} = require('./validation.js')
 const express = require('express')
 const db = require('../Database/db.js')
+const isAdmin = require('../config/admin.js')
 
 const router = express.Router()
 
 // Paginacao dos articles
 const limit = 10
 
-router.post('/', (req, res)=>{
+router.post('/', isAdmin, (req, res)=>{
     const article = {...req.body}
 
     try {
@@ -25,7 +26,7 @@ router.post('/', (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-router.put('/', (req, res)=>{
+router.put('/', isAdmin, (req, res)=>{
     const article = {...req.body}
 
     try {
@@ -45,7 +46,7 @@ router.put('/', (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAdmin, async (req, res) => {
     const articleId = req.params.id
 
     if(isNotPositiveInteger(parseInt(articleId))){
@@ -81,7 +82,7 @@ router.get('/:id', (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-router.get('/', async (req, res)=>{
+router.get('/', isAdmin, async (req, res)=>{
     const page = req.query.page || 1
 
     const result = await db('articles').count('id').first()
