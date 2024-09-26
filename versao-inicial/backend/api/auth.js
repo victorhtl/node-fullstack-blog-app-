@@ -44,11 +44,11 @@ router.post('/', async (req, res)=>{
 
     res.json({
         ...payload,
-        // criar o token
         token: jwt.encode(payload, authSecret)
     })
 })
 
+// Validate token according to date
 router.post('/validateToken', (req, res)=>{
     const user = req.body || null
     try {

@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt')
 const express = require('express')
 const {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
+const passport = require('passport')
 
 const router = express.Router()
 
