@@ -1,4 +1,3 @@
-const { authSecret } = require('../.env')
 const passportJwt = require('passport-jwt')
 const { Strategy, ExtractJwt } = passportJwt
 const db = require('../Database/db.js')
@@ -19,7 +18,6 @@ const strategy = new Strategy(params, (payload, done)=>{
         .then(user => done(null, user ? {...payload} : false))
         .catch(err => done(err, false))
 })
-//passport.authenticate('jwt', {session:false})
 
 module.exports = (passport) => {
     passport.use(strategy)
