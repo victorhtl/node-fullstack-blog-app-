@@ -1,10 +1,11 @@
-const {authSecret} = require('../.env')
 const jwt = require('jwt-simple')
 const bcrypt = require('bcrypt')
 const express = require('express')
 const db = require('../Database/db.js')
 
 const router = express.Router()
+
+require('dotenv').config
 
 // validate the user and generate JWT
 router.post('/', async (req, res)=>{
@@ -42,7 +43,7 @@ router.post('/', async (req, res)=>{
 
     res.json({
         ...payload,
-        token: jwt.encode(payload, authSecret)
+        token: jwt.encode(payload, process.env.AUTHSECRET)
     })
 })
 
