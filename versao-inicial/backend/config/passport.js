@@ -3,9 +3,11 @@ const passportJwt = require('passport-jwt')
 const { Strategy, ExtractJwt } = passportJwt
 const db = require('../Database/db.js')
 
+require('dotenv').config()
+
 // o passport-jwt vai pegar o cabeçalho "authorization" da requisição e ler o token que veio com ele
 const params = {
-    secretOrKey: authSecret,
+    secretOrKey: process.env.AUTHSECRET,
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken() // o token vai vir com "bearer" antes no token em si
 }
 
