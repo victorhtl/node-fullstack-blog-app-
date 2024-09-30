@@ -28,6 +28,7 @@ router.get('/:id', isAdmin, async (req, res)=>{
     try {
         const user = await db('users')
             .select('id', 'name', 'email', 'admin')
+            .whereNull('deletedAt')
             .where({id: userId})
             .first()
             .catch(err => res.sendStatus(500))
@@ -67,6 +68,7 @@ router.post('/', isAdmin, async (req, res)=>{
 router.get('/', isAdmin, (req, res)=>{
     db('users')
         .select('id', 'name', 'email', 'admin')
+        .whereNull('deletedAt')
         .then(resp => res.status(200).json(resp))
         .catch(err => res.status(500).send(err))   
 })
@@ -102,6 +104,7 @@ router.put('/', isAdmin, async (req,res)=>{
     db('users')
         .update(user)
         .where({id: user.id})
+        .whereNull('deletedAt')
         .then(_s => res.sendStatus(204))
         .catch(err => res.status(500).send(err))
     
@@ -115,19 +118,17 @@ router.delete('/:id', async(req,res)=>{
     }
 
     try {
-        const userFromDB = await db('users')
+        const articles = await db('articles')
+            .where({userId:userId})
+        notExistsOrError(articles, 'User has articles')
+
+        const rowsUpdated = await db('users')
+            .update({deletedAt: new Date()})
             .where({id: userId})
-            .first()
-        existsOrError(userFromDB, 'User do not exist')    
+        existsOrError(rowsUpdated, 'User do not exist')    
     } catch(msg){
         return res.status(400).send(msg)
     }
-
-    db('users')
-        .delete()
-        .where({id: userId})
-        .then(_ => res.status(204).send())
-        .catch(err => res.status(500).send(err))
 })
 
 module.exports = router
