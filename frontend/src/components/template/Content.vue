@@ -1,5 +1,8 @@
 <template>
-    <div class="content"></div>
+    <div class="content">
+        <!--this will render all my components-->
+        <router-view></router-view>
+    </div>
 </template>
 
 <script>
