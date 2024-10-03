@@ -73,8 +73,9 @@ router.get('/', isAdmin, (req, res)=>{
         .catch(err => res.status(500).send(err))   
 })
 
-router.put('/', isAdmin, async (req,res)=>{
+router.put('/:id', isAdmin, async (req,res)=>{
     const user = {...req.body}
+    user.id = req.params.id
 
     if(isNotPositiveInteger(user.id)){
         res.status(400).send('Id must be a positive integer numeber')
