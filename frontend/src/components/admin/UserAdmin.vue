@@ -115,6 +115,7 @@ export default {
                     this.reset()
                 })
                 .catch(showError)
+            this.reset()
         },
         loadUser(user, mode='save'){
             this.mode = mode
