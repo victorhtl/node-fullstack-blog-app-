@@ -114,8 +114,9 @@ router.post('/', isAdmin, (req, res) => {
         .catch(err => res.status(500).send(err))
 })
 
-router.put('/', isAdmin, (req, res) =>{
+router.put('/:id', isAdmin, (req, res) =>{
     const category = {...req.body}
+    category.id = req.params.id
 
     try {
         existsOrError(category.name, 'Category name is missing')
