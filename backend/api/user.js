@@ -77,11 +77,6 @@ router.put('/:id', isAdmin, async (req,res)=>{
     const user = {...req.body}
     user.id = req.params.id
 
-    if(isNotPositiveInteger(user.id)){
-        res.status(400).send('Id must be a positive integer numeber')
-        return
-    }
-
     try {
         existsOrError(user.id, "Id is missing")
         existsOrError(user.name, 'Name is missing')
@@ -98,8 +93,7 @@ router.put('/:id', isAdmin, async (req,res)=>{
         return res.status(400).send(msg)
     }
 
-    user.password = encryptPassoword(user.password)
-    user.password = encryptPassoword(user.password)
+    user.password = await encryptPassword(user.password)
     delete user.confirmPassword
 
     db('users')
