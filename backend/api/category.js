@@ -132,11 +132,7 @@ router.put('/:id', isAdmin, (req, res) =>{
 })
 
 router.delete('/:id', isAdmin, async (req, res)=>{
-    const categoryId = req.params.id
-
-    if(isNotPositiveInteger(parseInt(categoryId))){
-        return res.status(400).send('Id must be a positive integer number')
-    }
+    const categoryId = parseInt(req.params.id)
 
     try {
         existsOrError(categoryId, 'Category id is missing')
