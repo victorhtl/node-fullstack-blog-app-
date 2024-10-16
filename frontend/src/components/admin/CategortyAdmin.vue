@@ -3,8 +3,8 @@
         <b-form>
             <b-row>
                 <b-col xs="12">
-                    <b-form-group label="Name:" label-for="Category name">
-                        <b-form-input id="Category name" type="text"
+                    <b-form-group label="Name:" label-for="category-name">
+                        <b-form-input id="category-name" type="text"
                             v-model="category.name" required
                             :readonly="mode === 'remove'"
                             placeholder="Type in category name"></b-form-input>
