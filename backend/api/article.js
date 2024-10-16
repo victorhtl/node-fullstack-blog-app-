@@ -26,9 +26,9 @@ router.post('/', isAdmin, (req, res)=>{
         .catch(err => res.status(500).send(err))
 })
 
-router.put('/', isAdmin, (req, res)=>{
+router.put('/:id', isAdmin, (req, res)=>{
     const article = {...req.body}
-
+    article.id = req.params.id
     try {
         existsOrError(article.id, 'Id is missing')
         existsOrError(article.name, 'Name is missing')
