@@ -1,10 +1,13 @@
 ## NODEJS project
 
-### Run
+ports 8080 and 3000 should be free in your system
+you need to have a instance of postgres and mongodb running locally
 
-after cloning
+## How to Run this Project
+- run `git clone`
+### Run backend
 
-- run `cd /backend`
+- run `cd backend`
 - run `npm i`
 - create a .env file:
 ```
@@ -18,4 +21,9 @@ PGPASSWORD='your password'
 
 MONGOURL='mongodb://localhost:27017/test'
 ```
-`npm start`
+- run `npx knex migrate:latest`
+- run `npm start`
+### Run Frontend
+- run `cd frontend`
+- run `npm i`
+- run `npm run serve`
