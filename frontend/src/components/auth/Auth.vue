@@ -58,7 +58,7 @@
                 <input v-model="user.email" type="text" placeholder="Email">
                 <input v-model="user.password" type="password" placeholder="Password">
                 <a href="#">Forget your password?</a>
-                <button>Sign Up</button>
+                <button>Sign In</button>
             </div>
         </div>
 
@@ -194,7 +194,6 @@ export default {
     cursor: pointer;
 }
 
-/**Mudar isso para o v-if="showSignUp" na tag  */
 .container button.hidden{
     background-color: transparent;
     border-color: #fff;
