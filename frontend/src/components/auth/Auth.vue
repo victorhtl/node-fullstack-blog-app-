@@ -1,5 +1,5 @@
 <template>
-    <div class="container" id="container">
+    <div class="container" id="container" :class="{active: cssClass}">
         
         <div class="form-container sign-up">
 
@@ -28,7 +28,7 @@
                 <input v-model="user.password" type="password" placeholder="Password">
                 <input v-model="user.ConfirmPassword" type="password" placeholder="Confirm Password">
 
-                <button @click="signup">Sign Up</button>
+                <button>Sign Up</button>
 
             </div>
             
@@ -67,14 +67,12 @@
                 <div class="toggle-panel toggle-left">
                     <h1>Welcome Back!</h1>
                     <p>Enter your personal details to use all of site features</p>
-                    <!--Utilizar v-if no lugar de class hidden-->
-                    <button class="hidden" id="login">Sign In</button>
+                    <button @click="removeClass" class="hidden" id="login">Sign In</button>
                 </div>
                 <div class="toggle-panel toggle-right">
-                    <h1>Hellor Friend!</h1>
+                    <h1>Hello Friend!</h1>
                     <p>Register with your personal details to use all of site features</p>
-                    <!--Utilizar v-if no lugar de class hidden-->
-                    <button class="hidden" id="register">Sign Up</button>
+                    <button @click="addClass" class="hidden" id="register">Sign Up</button>
                 </div>
             </div>
         </div>
@@ -113,7 +111,8 @@ export default {
     data: function(){
         return {
             showSignup: false,
-            user: {}
+            user: {},
+            cssClass: false
         }
     },
     methods: {
@@ -125,6 +124,12 @@ export default {
                     this.$router.push({path: '/'})
                 })
                 .catch(showError)
+        },
+        addClass(){
+            this.cssClass = true
+        },
+        removeClass(){
+            this.cssClass = false
         }
     },
     signup(){
