@@ -1,12 +1,12 @@
 const express = require('express')
+const db = require('../Database/db.js')
+const {existsOrError, notExistsOrError, equalsOrError} = require('./validation.js')
+const encryptPassword = require('./bcrypt_conf.js')
 
 const router = express.Router()
 
 router.post('/', async (req, res)=>{
     const user = {...req.body}
-
-    // only admin can register a admin
-    if(!req.user.admin) user.admin = false
     
     try {
         existsOrError(user.name, 'Name is missing')

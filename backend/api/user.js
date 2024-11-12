@@ -1,22 +1,10 @@
-const bcrypt = require('bcrypt')
+const encryptPassword = require('./bcrypt_conf.js')
 const express = require('express')
 const {existsOrError, notExistsOrError, equalsOrError, isNotPositiveInteger} = require('./validation.js')
 const db = require('../Database/db.js')
 const isAdmin = require('../config/admin.js')
 
 const router = express.Router()
-
-function encryptPassword(password) {
-    const saltRounds = 10; // between 10-12 is recommended
-    return bcrypt.genSalt(saltRounds)
-        .then(salt => bcrypt.hash(password, salt))
-        .then(hash => {
-            return hash;
-        })
-        .catch(err => {
-            throw err;
-        });
-}
 
 router.get('/:id', isAdmin, async (req, res)=>{
     const userId = parseInt(req.params.id)
