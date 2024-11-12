@@ -1,5 +1,5 @@
 <template>
-    <div class="container" id="container" :class="{active: cssClass}">
+    <div class="container" id="container" :class="{active: showSignup}">
         
         <div class="form-container sign-up">
 
@@ -26,9 +26,10 @@
                 <input v-model="user.name" type="text" placeholder="Name">
                 <input v-model="user.email" type="text" placeholder="Email">
                 <input v-model="user.password" type="password" placeholder="Password">
-                <input v-model="user.ConfirmPassword" type="password" placeholder="Confirm Password">
+                <input v-model="user.confirmPassword" type="password" placeholder="Confirm Password">
+                <input v-model="user.admin" type="hidden">
 
-                <button>Sign Up</button>
+                <button @click="signup">Sign Up</button>
 
             </div>
             
@@ -67,37 +68,15 @@
                 <div class="toggle-panel toggle-left">
                     <h1>Welcome Back!</h1>
                     <p>Enter your personal details to use all of site features</p>
-                    <button @click="removeClass" class="hidden" id="login">Sign In</button>
+                    <button @click="showSignup = !showSignup" class="hidden" id="login">Sign In</button>
                 </div>
                 <div class="toggle-panel toggle-right">
                     <h1>Hello Friend!</h1>
                     <p>Register with your personal details to use all of site features</p>
-                    <button @click="addClass" class="hidden" id="register">Sign Up</button>
+                    <button @click="showSignup = !showSignup" class="hidden" id="register">Sign Up</button>
                 </div>
             </div>
         </div>
-        
-        <!--
-        <div class="auth-modal">
-            <img src="@/assets/logo.png" width="200" alt="Logo" />
-            <hr>
-            <div class="auth-title">{{ showSignup ? 'SignUp' : 'Login' }}</div>
-        
-            <input v-if="showSignup" v-model="user.name" type="text" placeholder="Name">
-            <input v-model="user.email" type="text" placeholder="Email">
-            <input v-model="user.password" type="password" placeholder="Password">
-            <input v-if="showSignup" v-model="user.confirmPassword" 
-                type="password" placeholder="Confirm Password">
-
-            <button v-if="showSignup" @click="signup">Register</button>
-            <button v-else @click="signin">Enter</button>
-
-            <a href @click.prevent="showSignup = !showSignup">
-                <span v-if="showSignup">Already register? SignIn!</span>
-                <span v-else>Not Registered? SignUp!</span>
-            </a>
-        </div>
-        -->
 
     </div>
 </template>
@@ -112,7 +91,6 @@ export default {
         return {
             showSignup: false,
             user: {},
-            cssClass: false
         }
     },
     methods: {
@@ -120,27 +98,21 @@ export default {
             axios.post(`${baseApiUrl}/signin`, this.user)
                 .then(res => {
                     this.$store.commit('setUser', res.data)
-                    localStorage.setItem(userKey, JSON.stringify(res.data))
-                    this.$router.push({path: '/'})
+                    localStorage.setItem(userKey, JSON.stringify(res.data)) // localStore stores only strings
+                    this.$router.push({path: '/'}) // return to system initial page
                 })
                 .catch(showError)
         },
-        addClass(){
-            this.cssClass = true
-        },
-        removeClass(){
-            this.cssClass = false
+        signup(){
+            axios.post(`${baseApiUrl}/signup`, this.user)
+                .then(()=>{
+                    this.$toasted.global.defaultSuccess()
+                    this.user = {}
+                    this.showSignup = false
+                })
+                .catch(showError)
         }
     },
-    signup(){
-        axios.post(`${baseApiUrl}/signup`, this.user) // ver no postman
-            .then(()=>{
-                this.$toasted.global.defaultSuccess()
-                this.user = {}
-                this.showSignup = false
-            })
-            .catch(showError)
-    }
 }
 </script>
 

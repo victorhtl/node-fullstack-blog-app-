@@ -1,6 +1,9 @@
 import Vue from 'vue'
 
-export const userKey = '__knowledge_user' // in browser console, type: localStorage.__knowledge_user
+// this name can be whatever you want
+// in browser console, you can type: localStorage.__knowledge_user
+// this will be used for storing information in browser local storage, without need for cookies
+export const userKey = '__my_application_user' 
 export const baseApiUrl = 'http://localhost:3000'
 
 // treating error from de backend
@@ -14,3 +17,5 @@ export function showError(e){
         Vue.toasted.global.defaultError()
     }
 }
+
+export default {baseApiUrl, showError, userKey}
