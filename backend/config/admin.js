@@ -6,6 +6,6 @@ module.exports = (req, res, next) => {
         if(req.user.admin){
             next()
         } else {
-            res.status(402).send('User is not admin')
+            res.status(401).send('User is not admin')
         }
     }
