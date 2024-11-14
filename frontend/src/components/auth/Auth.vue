@@ -59,7 +59,7 @@
                 <input v-model="user.email" type="text" placeholder="Email">
                 <input v-model="user.password" type="password" placeholder="Password">
                 <a href="#">Forget your password?</a>
-                <button>Sign In</button>
+                <button @click="signin">Sign In</button>
             </div>
         </div>
 
