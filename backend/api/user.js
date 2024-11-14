@@ -95,16 +95,12 @@ router.put('/:id', isAdmin, async (req,res)=>{
 
 router.delete('/:id', async(req,res)=>{
     const userId = parseInt(req.params.id)
-
-    if(isNotPositiveInteger(userId)){
-        return res.status(400).send('Id must be a positive integer number')
-    }
-
     try {
         const articles = await db('articles')
-            .where({userId:userId})
+        .where({userId:userId})
         notExistsOrError(articles, 'User has articles')
-
+        
+        console.log('hi')
         const rowsUpdated = await db('users')
             .update({deletedAt: new Date()})
             .where({id: userId})
@@ -112,6 +108,7 @@ router.delete('/:id', async(req,res)=>{
     } catch(msg){
         return res.status(400).send(msg)
     }
+    return res.sendStatus(204)
 })
 
 module.exports = router
