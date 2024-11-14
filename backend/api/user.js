@@ -102,7 +102,7 @@ router.delete('/:id', async(req,res)=>{
         
         console.log('hi')
         const rowsUpdated = await db('users')
-            .update({deletedAt: new Date()})
+            .delete()
             .where({id: userId})
         existsOrError(rowsUpdated, 'User do not exist')    
     } catch(msg){

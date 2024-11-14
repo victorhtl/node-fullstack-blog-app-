@@ -15,13 +15,13 @@ router.post('/', async (req, res)=>{
         existsOrError(user.confirmPassword, 'Confirm Password is missing')
         equalsOrError(user.password, user.confirmPassword, 'Passwords do not match')
         delete user.confirmPassword
-        const userFromDB = await db('users').where({email: user.email}).first()
+        const userFromDB = await db('users').where({email: user.email}).whereNull('deletedAt').first()
         notExistsOrError(userFromDB, 'User already exists')
-
+        
     } catch(msg) {
         return res.status(400).send(msg)
     }
-
+    
     user.password = await encryptPassword(user.password)
     
     db('users')
