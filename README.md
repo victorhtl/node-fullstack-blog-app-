@@ -30,3 +30,15 @@ MONGOURL='mongodb://localhost:27017/test'
 - run `npm i`
 - run `npm run serve`
 - Access your application by entering localhost:8080 in your browser
+- In order to create an admin user, you will need to create directly into the database, or using postman
+
+URL: localhost:3000/signup
+```json
+{
+    "name": "silva",
+    "email": "silva@gmail.com",
+    "password": "123456",
+    "confirmPassword": "123456",
+    "admin": true
+}
+```
