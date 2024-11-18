@@ -7,6 +7,23 @@ const router = express.Router()
 
 require('dotenv').config
 
+router.post('/validateToken', (req, res)=>{
+    const userData = req.body || null
+    console.log(userData)
+    try {
+        if(userData){
+            const token = jwt.decode(userData.token, process.env.AUTHSECRET) // verificar se este userData.token existe mesmo
+            if(new Date(token.exp * 1000)> new Date()){
+                return res.send(true)
+            }
+        }
+    } catch(e){
+        
+    }
+    res.send(false)
+})
+
+
 // validate the user and generate JWT
 router.post('/', async (req, res)=>{
     // valida o usuario
@@ -46,5 +63,6 @@ router.post('/', async (req, res)=>{
         token: jwt.encode(payload, process.env.AUTHSECRET)
     })
 })
+
 
 module.exports = router
