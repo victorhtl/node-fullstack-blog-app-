@@ -6,7 +6,8 @@ you need to have a instance of postgres and mongodb running locally
 This project was built using Node v20.15.0
 
 ## How to Run this Project
-- run `git clone`
+- run `git clone git@github.com:victorhtl/node-fullstack-blog-app-.git`
+- run `cd node-fullstack-blog-app-`
 ### Run backend
 
 - run `cd backend`
