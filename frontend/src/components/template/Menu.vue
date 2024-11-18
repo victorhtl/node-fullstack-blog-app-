@@ -41,6 +41,11 @@ export default {
                 name: 'articlesByCategory',
                 params: {id: node.id}
             })
+
+            // closes menu when screen resises for small devices
+            if(this.$mq === 'xs' || this.$mq === 'sm'){
+                this.$store.commit('toggleMenu', false)
+            }
         }
     },
     mounted(){

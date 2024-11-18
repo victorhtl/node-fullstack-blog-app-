@@ -3,6 +3,8 @@
 ports 8080 and 3000 should be free in your system
 you need to have a instance of postgres and mongodb running locally
 
+This project was built using Node v20.15.0
+
 ## How to Run this Project
 - run `git clone`
 ### Run backend
@@ -27,3 +29,4 @@ MONGOURL='mongodb://localhost:27017/test'
 - run `cd frontend`
 - run `npm i`
 - run `npm run serve`
+- Access your application by entering localhost:8080 in your browser
