@@ -5,6 +5,7 @@ import App from './App'
 
 import './config/bootstrap.js'
 import './config/msgs.js'
+import './config/axios.js'
 import store from './config/store.js'
 import router from './config/router.js'
 
